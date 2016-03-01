@@ -69,6 +69,31 @@ public class MultiItemRouteBuilderTest extends CamelTestSupport {
 		assertTrue(notify.matches(3, TimeUnit.SECONDS));
 	}
 	
+	@Test
+	public void test_split_route_many_products() {
+		
+		NotifyBuilder notify = new NotifyBuilder(context)
+				.from(MultiItemRouteBuilder.DIRECT_ORDER_TOP_ENDPOINT)
+				.whenExactlyDone(10)
+				.wereSentTo(MultiItemRouteBuilder.DIRECT_PRODUCT_TOP_ENDPOINT)
+				.create();
+		
+		Order order = new Order();
+		order.setTransactionId("42");
+		for (int i=0;i<10;i++) {
+			order.addProduct(new Product(new Integer(i).toString(), null, null));
+		}
+		
+		Object obj = camelProducer.requestBody(order);
+		assertNotNull(obj);
+		
+		Order processedOrder = (Order) obj;
+		List<Product> pList = processedOrder.getProductList();
+		assertNotNull(pList);
+		assertEquals(10, pList.size());
+	
+		assertTrue(notify.matches(5, TimeUnit.SECONDS));
+	}
     
     @Test
     public void test_split_route_concurrent() throws InterruptedException {

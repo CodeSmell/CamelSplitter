@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.apache.camel.Body;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spi.ThreadPoolProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import codesmell.domain.Order;
@@ -20,7 +22,8 @@ import codesmell.domain.Product;
  * http://camel.apache.org/splitter.html
  */
 public class MultiItemRouteBuilder extends RouteBuilder {
-
+	private static Logger log = LoggerFactory.getLogger(MultiItemRouteBuilder.class);
+	
 	@Autowired
 	ThreadPoolProfile splitterThreadPool;
 	
@@ -29,6 +32,7 @@ public class MultiItemRouteBuilder extends RouteBuilder {
 	
 	@Override
 	public void configure() throws Exception {
+		log.debug("configuring routes...");
 		//
 		// register the thread pool
 		//
@@ -41,7 +45,8 @@ public class MultiItemRouteBuilder extends RouteBuilder {
 			.log("received order: ${body}")
 			.split()
 				.method(this, "splitProducts")
-				//.executorServiceRef(CamelConfig.SPLITTER_THREAD_POOL)
+				.parallelProcessing()
+//				.executorServiceRef(splitterThreadPool.getId())
 				.to(DIRECT_PRODUCT_TOP_ENDPOINT)
 			.log("completed order: ${body}")
 			.end();
@@ -50,9 +55,10 @@ public class MultiItemRouteBuilder extends RouteBuilder {
 		// route handling the product
 		//
 		from(DIRECT_PRODUCT_TOP_ENDPOINT).routeId("productRoute")
-			.log("processing item: ${body}")
+			//.log("processing item: ${body}")
 			.process(exchange -> {
 				Product product = (Product) exchange.getIn().getBody();
+				Thread.sleep(200);
 				product.setPin(UUID.randomUUID().toString());
 			})
 			.end();
