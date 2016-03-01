@@ -14,7 +14,7 @@ import codesmell.domain.Order;
 import codesmell.domain.Product;
 
 /**
- * Take an order comprised of multiple projects,
+ * Take an order comprised of multiple products,
  * split them into separate products for parallel processing
  * then pull all back together into a single response  
  *
@@ -27,8 +27,8 @@ public class MultiItemRouteBuilder extends RouteBuilder {
 	@Autowired
 	ThreadPoolProfile splitterThreadPool;
 	
-	public static final String DIRECT_ORDER_TOP_ENDPOINT = "direct:order.top";
-	public static final String DIRECT_PRODUCT_TOP_ENDPOINT = "direct:product.top";
+	public static final String DIRECT_ORDER_ENDPOINT = "direct:order";
+	public static final String DIRECT_PRODUCT_ENDPOINT = "direct:product";
 	
 	@Override
 	public void configure() throws Exception {
@@ -41,20 +41,20 @@ public class MultiItemRouteBuilder extends RouteBuilder {
 		//
 		// route handling the order
 		//
-		from(DIRECT_ORDER_TOP_ENDPOINT).routeId("multiItemRoute")
+		from(DIRECT_ORDER_ENDPOINT).routeId("multiItemRoute")
 			.log("received order: ${body}")
 			.split()
 				.method(this, "splitProducts")
 				.parallelProcessing()
 //				.executorServiceRef(splitterThreadPool.getId())
-				.to(DIRECT_PRODUCT_TOP_ENDPOINT)
+				.to(DIRECT_PRODUCT_ENDPOINT)
 			.log("completed order: ${body}")
 			.end();
 		
 		//
 		// route handling the product
 		//
-		from(DIRECT_PRODUCT_TOP_ENDPOINT).routeId("productRoute")
+		from(DIRECT_PRODUCT_ENDPOINT).routeId("productRoute")
 			//.log("processing item: ${body}")
 			.process(exchange -> {
 				Product product = (Product) exchange.getIn().getBody();

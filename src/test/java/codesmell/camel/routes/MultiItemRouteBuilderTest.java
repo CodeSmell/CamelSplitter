@@ -25,7 +25,7 @@ import codesmell.util.ConcurrentTestUtil;
 @ContextConfiguration(classes = { CamelConfig.class }, loader = AnnotationConfigContextLoader.class)
 public class MultiItemRouteBuilderTest extends CamelTestSupport {
 
-	@Produce(uri = MultiItemRouteBuilder.DIRECT_ORDER_TOP_ENDPOINT)
+	@Produce(uri = MultiItemRouteBuilder.DIRECT_ORDER_ENDPOINT)
 	ProducerTemplate camelProducer;
 	
 	@Autowired
@@ -41,9 +41,9 @@ public class MultiItemRouteBuilderTest extends CamelTestSupport {
 	public void test_split_route() {
 		
 		NotifyBuilder notify = new NotifyBuilder(context)
-				.from(MultiItemRouteBuilder.DIRECT_ORDER_TOP_ENDPOINT)
+				.from(MultiItemRouteBuilder.DIRECT_ORDER_ENDPOINT)
 				.whenExactlyDone(2)
-				.wereSentTo(MultiItemRouteBuilder.DIRECT_PRODUCT_TOP_ENDPOINT)
+				.wereSentTo(MultiItemRouteBuilder.DIRECT_PRODUCT_ENDPOINT)
 				.create();
 		
 		Order order = new Order();
@@ -73,9 +73,9 @@ public class MultiItemRouteBuilderTest extends CamelTestSupport {
 	public void test_split_route_many_products() {
 		
 		NotifyBuilder notify = new NotifyBuilder(context)
-				.from(MultiItemRouteBuilder.DIRECT_ORDER_TOP_ENDPOINT)
+				.from(MultiItemRouteBuilder.DIRECT_ORDER_ENDPOINT)
 				.whenExactlyDone(10)
-				.wereSentTo(MultiItemRouteBuilder.DIRECT_PRODUCT_TOP_ENDPOINT)
+				.wereSentTo(MultiItemRouteBuilder.DIRECT_PRODUCT_ENDPOINT)
 				.create();
 		
 		Order order = new Order();

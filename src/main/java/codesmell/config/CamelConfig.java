@@ -25,13 +25,13 @@ public class CamelConfig extends CamelConfiguration {
 	public static final String SPLITTER_THREAD_POOL = "splitterThreadPool";
 	
 	@Value(value = "${splitterPoolSize}")
-	Integer poolSize;
+	private Integer poolSize;
 	
 	@Value(value = "${splitterMaxPoolSize}")
-	Integer maxPoolSize;
+	private Integer maxPoolSize;
 	
 	@Value(value = "${splitterMaxQueueSize}")
-	Integer maxQueueSize;
+	private Integer maxQueueSize;
 
 	
 	@Override
